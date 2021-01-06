@@ -1,6 +1,7 @@
 package teditor;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -50,9 +52,10 @@ public class Teditor {
     JMenuItem aboutItem = new JMenuItem("About");
 
     public void design() {
-        frame.setSize(500, 400);
+        frame.setSize(600, 450);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocation(200, 150);
+//        frame.setLocation(200, 150);
+        frame.setLocationRelativeTo(null);
 
         // adding file menu items
         fileMenu.add(newItem);
@@ -84,6 +87,7 @@ public class Teditor {
         frame.setVisible(true);
     }
 
+    // stores the name of the file that is currently open
     String currentOpenFile = null;
 
     void buttonFunctions() {
@@ -133,6 +137,23 @@ public class Teditor {
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, e.getMessage());
                     }
+                } else {
+                    JFileChooser saveAsFile = new JFileChooser();
+                    int response = saveAsFile.showSaveDialog(frame);
+
+                    if (response == JFileChooser.APPROVE_OPTION) {
+                        // gets the specified file
+                        File file = new File(saveAsFile.getSelectedFile().getAbsolutePath());
+
+                        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+                                PrintWriter printWriter = new PrintWriter(bufferedWriter, true);) {
+
+                            printWriter.println(textArea.getText());  // writes content to the file
+                            currentOpenFile = file.getAbsolutePath();
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(frame, e.getMessage());
+                        }
+                    }
                 }
             }
         });
@@ -166,10 +187,21 @@ public class Teditor {
             }
         });
 
-        aboutItem.addActionListener(new ActionListener() {
+        fontColor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                JOptionPane.showMessageDialog(frame, "Teditor 2021\nVersion 0.0.1");
+                JColorChooser fontColorChooser = new JColorChooser();
+                Color fontColor = fontColorChooser.showDialog(frame, "Choose a Text Color", Color.BLACK);
+                textArea.setForeground(fontColor);
+            }
+        });
+
+        backgroundColor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JColorChooser bgColorChooser = new JColorChooser();
+                Color fontColor = bgColorChooser.showDialog(frame, "Choose a Background Color", Color.WHITE);
+                textArea.setBackground(fontColor);
             }
         });
 
@@ -188,6 +220,14 @@ public class Teditor {
                 textArea.setWrapStyleWord(false);
             }
         });
+
+        aboutItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JOptionPane.showMessageDialog(frame, "Teditor\nCopyright 2021\nVersion 0.0.2");
+            }
+        });
+
     }
 
     public static void main(String[] args) {
@@ -203,5 +243,4 @@ public class Teditor {
         } catch (Exception e) {
         }
     }
-
 }
