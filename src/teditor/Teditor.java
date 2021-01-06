@@ -39,10 +39,12 @@ public class Teditor {
     JMenuItem exitItem = new JMenuItem("Exit");
 
     // edit menu items
-    JMenuItem fontItem = new JMenuItem("Font");
-    JMenuItem replaceItem = new JMenuItem("Replace");
-    JMenuItem wordWrapItem = new JMenuItem("Word Wrap");
+    JMenuItem fontColor = new JMenuItem("Font Color");
     JMenuItem backgroundColor = new JMenuItem("Background Color");
+    JMenuItem replace = new JMenuItem("Replace");
+    JMenu lineWrap = new JMenu("Line Wrap");
+    JMenuItem lineWrapOn = new JMenuItem("On");
+    JMenuItem lineWrapOff = new JMenuItem("Off");
 
     // help menu item
     JMenuItem aboutItem = new JMenuItem("About");
@@ -60,10 +62,12 @@ public class Teditor {
         fileMenu.add(exitItem);
 
         // adding edit menu items
-        editMenu.add(fontItem);
-        editMenu.add(replaceItem);
-        editMenu.add(wordWrapItem);
+        editMenu.add(fontColor);
         editMenu.add(backgroundColor);
+        editMenu.add(replace);
+        editMenu.add(lineWrap);
+        lineWrap.add(lineWrapOn);
+        lineWrap.add(lineWrapOff);
 
         // adding help menu items
         helpMenu.add(aboutItem);
@@ -166,6 +170,22 @@ public class Teditor {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 JOptionPane.showMessageDialog(frame, "Teditor 2021\nVersion 0.0.1");
+            }
+        });
+
+        lineWrapOn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+            }
+        });
+
+        lineWrapOff.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                textArea.setLineWrap(false);
+                textArea.setWrapStyleWord(false);
             }
         });
     }
