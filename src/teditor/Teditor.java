@@ -54,7 +54,6 @@ public class Teditor {
     public void design() {
         frame.setSize(600, 450);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setLocation(200, 150);
         frame.setLocationRelativeTo(null);
 
         // adding file menu items
@@ -71,6 +70,24 @@ public class Teditor {
         editMenu.add(lineWrap);
         lineWrap.add(lineWrapOn);
         lineWrap.add(lineWrapOff);
+
+        // working on the find and replace option
+        replace.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String[] words = JOptionPane
+                        .showInputDialog("Enter Word to find\n and what to replace it with\nSeparated by comma")
+                        .split(",");
+                String wordToFind = words[0];
+                String replaceWith = words[1];
+
+                // set the text to correct words
+                textArea.setText(textArea.getText().replaceAll(wordToFind, replaceWith));
+            }
+        });
+
+
+        // end of find and replace option
 
         // adding help menu items
         helpMenu.add(aboutItem);
@@ -224,7 +241,7 @@ public class Teditor {
         aboutItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                JOptionPane.showMessageDialog(frame, "Teditor\nCopyright 2021\nVersion 0.0.2");
+                JOptionPane.showMessageDialog(frame, "Teditor\nCopyright 2021\nVersion 0.0.4");
             }
         });
 
