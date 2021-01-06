@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Teditor {
 
@@ -42,7 +43,7 @@ public class Teditor {
 
     // edit menu items
     JMenuItem fontColor = new JMenuItem("Font Color");
-    JMenuItem backgroundColor = new JMenuItem("Background Color");
+    JMenuItem bgColor = new JMenuItem("Background Color");
     JMenuItem replace = new JMenuItem("Replace");
     JMenu lineWrap = new JMenu("Line Wrap");
     JMenuItem lineWrapOn = new JMenuItem("On");
@@ -50,6 +51,26 @@ public class Teditor {
 
     // help menu item
     JMenuItem aboutItem = new JMenuItem("About");
+
+    // open dialog box to choose a file
+    JFileChooser fileChooser = new JFileChooser();
+
+    // file name extensions
+    FileNameExtensionFilter textFileExtension = new FileNameExtensionFilter("Text Files (*.txt)", "txt");
+    FileNameExtensionFilter htmlFileExtension = new FileNameExtensionFilter("HyperText Markup Language (*.html)", "html");
+    FileNameExtensionFilter cssFileExtension = new FileNameExtensionFilter("Cascading Style Sheets (*.css)", "css");
+    FileNameExtensionFilter jsFileExtension = new FileNameExtensionFilter("JavaScript (*.js)", "js");
+    FileNameExtensionFilter pythonFileExtension = new FileNameExtensionFilter("Python (*.py)", "py");
+    FileNameExtensionFilter javaFileExtension = new FileNameExtensionFilter("Java (*.java)", "java");
+
+    void addFileExtensions() {
+        fileChooser.setFileFilter(htmlFileExtension);
+        fileChooser.setFileFilter(cssFileExtension);
+        fileChooser.setFileFilter(jsFileExtension);
+        fileChooser.setFileFilter(javaFileExtension);
+        fileChooser.setFileFilter(pythonFileExtension);
+        fileChooser.setFileFilter(textFileExtension);
+    }
 
     public void design() {
         frame.setSize(600, 450);
@@ -65,29 +86,11 @@ public class Teditor {
 
         // adding edit menu items
         editMenu.add(fontColor);
-        editMenu.add(backgroundColor);
+        editMenu.add(bgColor);
         editMenu.add(replace);
         editMenu.add(lineWrap);
         lineWrap.add(lineWrapOn);
         lineWrap.add(lineWrapOff);
-
-        // working on the find and replace option
-        replace.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                String[] words = JOptionPane
-                        .showInputDialog("Enter Word to find\n and what to replace it with\nSeparated by comma")
-                        .split(",");
-                String wordToFind = words[0];
-                String replaceWith = words[1];
-
-                // set the text to correct words
-                textArea.setText(textArea.getText().replaceAll(wordToFind, replaceWith));
-            }
-        });
-
-
-        // end of find and replace option
 
         // adding help menu items
         helpMenu.add(aboutItem);
@@ -108,32 +111,31 @@ public class Teditor {
     String currentOpenFile = null;
 
     void buttonFunctions() {
+        addFileExtensions();  // adding the file extensions to choose from
 
         newItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 // TODO: sent new file to tabbed menu on the text editor
                 textArea.setText("");
+                frame.setTitle("Teditor");
             }
         });
 
         openItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                JFileChooser openNewFile = new JFileChooser();
-                int response = openNewFile.showOpenDialog(frame);
-
+                int response = fileChooser.showOpenDialog(frame);
                 if (response == JFileChooser.APPROVE_OPTION) {
                     // gets the specified file
-                    File file = new File(openNewFile.getSelectedFile().getAbsolutePath());
+                    File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
                     try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
                         String currentLine;
-                        String content = "";
                         while ((currentLine = bufferedReader.readLine()) != null) {
-                            content += currentLine + "\n";
+                            textArea.append(currentLine + "\n");
                         }
-                        textArea.setText(content);
-                        currentOpenFile = file.getAbsolutePath();
+                        currentOpenFile = file.getName();
+                        frame.setTitle(currentOpenFile + " - Teditor");
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, e.getMessage());
                     }
@@ -147,26 +149,24 @@ public class Teditor {
                 if (currentOpenFile != null) {
                     File file = new File(currentOpenFile);
 
-                    try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-                            PrintWriter printWriter = new PrintWriter(bufferedWriter, true);) {
+                    try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+                            PrintWriter printWriter = new PrintWriter(bufferedWriter, true)) {
 
                         printWriter.println(textArea.getText());  // writes content to the file
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, e.getMessage());
                     }
                 } else {
-                    JFileChooser saveAsFile = new JFileChooser();
-                    int response = saveAsFile.showSaveDialog(frame);
-
+                    int response = fileChooser.showSaveDialog(frame);
                     if (response == JFileChooser.APPROVE_OPTION) {
-                        // gets the specified file
-                        File file = new File(saveAsFile.getSelectedFile().getAbsolutePath());
+                        File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
 
                         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
                                 PrintWriter printWriter = new PrintWriter(bufferedWriter, true);) {
 
                             printWriter.println(textArea.getText());  // writes content to the file
-                            currentOpenFile = file.getAbsolutePath();
+                            currentOpenFile = file.getName();
+                            frame.setTitle(currentOpenFile + " - Teditor");
                         } catch (Exception e) {
                             JOptionPane.showMessageDialog(frame, e.getMessage());
                         }
@@ -185,11 +185,11 @@ public class Teditor {
                     // gets the specified file
                     File file = new File(saveAsFile.getSelectedFile().getAbsolutePath());
 
-                    try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-                            PrintWriter printWriter = new PrintWriter(bufferedWriter, true);) {
+                    try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))) {
 
-                        printWriter.println(textArea.getText());  // writes content to the file
-                        currentOpenFile = file.getAbsolutePath();
+                        bufferedWriter.write(textArea.getText());// writes content to the file
+                        currentOpenFile = file.getName();
+                        frame.setTitle(currentOpenFile + " - Teditor");
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, e.getMessage());
                     }
@@ -208,17 +208,31 @@ public class Teditor {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 JColorChooser fontColorChooser = new JColorChooser();
-                Color fontColor = fontColorChooser.showDialog(frame, "Choose a Text Color", Color.BLACK);
+                Color fontColor = fontColorChooser.showDialog(frame, "Choose Text Color", Color.BLACK);
                 textArea.setForeground(fontColor);
             }
         });
 
-        backgroundColor.addActionListener(new ActionListener() {
+        bgColor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 JColorChooser bgColorChooser = new JColorChooser();
-                Color fontColor = bgColorChooser.showDialog(frame, "Choose a Background Color", Color.WHITE);
+                Color fontColor = bgColorChooser.showDialog(frame, "Choose Background Color", Color.WHITE);
                 textArea.setBackground(fontColor);
+            }
+        });
+
+        replace.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String[] words = JOptionPane
+                        .showInputDialog("Enter Word to find\n and what to replace it with\nSeparated by comma")
+                        .split(",");
+                String wordToFind = words[0].trim();
+                String replaceWith = words[1].trim();
+
+                // replacing the words
+                textArea.setText(textArea.getText().replaceAll(wordToFind, replaceWith));
             }
         });
 
@@ -244,7 +258,6 @@ public class Teditor {
                 JOptionPane.showMessageDialog(frame, "Teditor\nCopyright 2021\nVersion 0.0.4");
             }
         });
-
     }
 
     public static void main(String[] args) {
