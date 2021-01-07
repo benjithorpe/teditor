@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -33,6 +35,8 @@ public class Teditor {
     JScrollPane scrollPane = new JScrollPane(textArea,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    JFileChooser fileChooser = new JFileChooser();
+    Icon icon = new ImageIcon(getClass().getResource("icon2.png"));
 
     // file menu items
     JMenuItem newItem = new JMenuItem("New");
@@ -52,8 +56,6 @@ public class Teditor {
     // help menu item
     JMenuItem aboutItem = new JMenuItem("About");
 
-    // open dialog box to choose a file
-    JFileChooser fileChooser = new JFileChooser();
 
     // file name extensions
     FileNameExtensionFilter textFileExtension = new FileNameExtensionFilter("Text Files (*.txt)", "txt");
@@ -76,6 +78,7 @@ public class Teditor {
         frame.setSize(600, 450);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
+//        frame.setIconImage(icon);
 
         // adding file menu items
         fileMenu.add(newItem);
