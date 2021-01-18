@@ -9,15 +9,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -25,7 +28,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Teditor {
 
-    JFrame frame = new JFrame("Teditor");
+    JFrame mainFrame = new JFrame("Teditor");
     JMenu fileMenu = new JMenu("File");
     JMenu editMenu = new JMenu("Edit");
     JMenu helpMenu = new JMenu("Help");
@@ -79,9 +82,9 @@ public class Teditor {
     }
 
     public void design() {
-        frame.setSize(600, 450);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        mainFrame.setSize(600, 450);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setLocationRelativeTo(null);
 
         // adding file menu items
         fileMenu.add(newItem);
@@ -125,9 +128,9 @@ public class Teditor {
         textArea.setFont(new Font("Liberation Mono", defaultFontStyle, 14));
 
         // adding components
-        frame.getContentPane().add(BorderLayout.NORTH, menuPanel);
-        frame.getContentPane().add(BorderLayout.CENTER, scrollPane);
-        frame.setVisible(true);
+        mainFrame.getContentPane().add(BorderLayout.NORTH, menuPanel);
+        mainFrame.getContentPane().add(BorderLayout.CENTER, scrollPane);
+        mainFrame.setVisible(true);
     }
 
     int defaultFontStyle = Font.PLAIN;
@@ -145,12 +148,12 @@ public class Teditor {
         newItem.addActionListener((ae) -> {
             // TODO: send new file to tabbed menu on the text editor
             textArea.setText("");
-            frame.setTitle("Teditor");
+            mainFrame.setTitle("Teditor");
         });
 
         openItem.addActionListener((ae) -> {
 
-            int response = fileChooser.showOpenDialog(frame);
+            int response = fileChooser.showOpenDialog(mainFrame);
             if (response == JFileChooser.APPROVE_OPTION) {
 
                 File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
@@ -162,9 +165,9 @@ public class Teditor {
                         textArea.append(currentLine + "\n");
                     }
                     currentOpenFile = file.getName();
-                    frame.setTitle(currentOpenFile + " - Teditor");
+                    mainFrame.setTitle(currentOpenFile + " - Teditor");
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(frame, e.getMessage());
+                    JOptionPane.showMessageDialog(mainFrame, e.getMessage());
                 }
             }
         });
@@ -180,10 +183,10 @@ public class Teditor {
 
                     printWriter.println(textArea.getText());  // writes content to the file
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(frame, e.getMessage());
+                    JOptionPane.showMessageDialog(mainFrame, e.getMessage());
                 }
             } else {
-                int response = fileChooser.showSaveDialog(frame);
+                int response = fileChooser.showSaveDialog(mainFrame);
                 if (response == JFileChooser.APPROVE_OPTION) {
                     File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
 
@@ -193,9 +196,9 @@ public class Teditor {
 
                         printWriter.println(textArea.getText());  // writes content to the file
                         currentOpenFile = file.getName();
-                        frame.setTitle(currentOpenFile + " - Teditor");
+                        mainFrame.setTitle(currentOpenFile + " - Teditor");
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(frame, e.getMessage());
+                        JOptionPane.showMessageDialog(mainFrame, e.getMessage());
                     }
                 }
             }
@@ -204,7 +207,7 @@ public class Teditor {
         saveAsItem.addActionListener((ae) -> {
 
             JFileChooser saveAsFile = new JFileChooser();
-            int response = saveAsFile.showSaveDialog(frame);
+            int response = saveAsFile.showSaveDialog(mainFrame);
 
             if (response == JFileChooser.APPROVE_OPTION) {
                 File file = new File(saveAsFile.getSelectedFile().getAbsolutePath());
@@ -213,9 +216,9 @@ public class Teditor {
 
                     bufferedWriter.write(textArea.getText()); // writes content to the file
                     currentOpenFile = file.getName();
-                    frame.setTitle(currentOpenFile + " - Teditor");
+                    mainFrame.setTitle(currentOpenFile + " - Teditor");
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(frame, e.getMessage());
+                    JOptionPane.showMessageDialog(mainFrame, e.getMessage());
                 }
             }
         });
@@ -257,25 +260,17 @@ public class Teditor {
         });
 
         fontColor.addActionListener((ae) -> {
-            Color color = JColorChooser.showDialog(frame, "Font Color", Color.BLACK);
-            textArea.setForeground(color);
+            Color colo = JColorChooser.showDialog(mainFrame, "Font Color", Color.BLACK);
+            textArea.setForeground(colo);
         });
 
         bgColor.addActionListener((ae) -> {
-            Color color = JColorChooser.showDialog(frame, "Background Color", Color.WHITE);
-            textArea.setBackground(color);
+            Color colo = JColorChooser.showDialog(mainFrame, "Background Color", Color.WHITE);
+            textArea.setBackground(colo);
         });
 
         replace.addActionListener((ae) -> {
-
-            String[] words = JOptionPane
-                    .showInputDialog("Enter Word to find\n and what to replace it with\nSeparated by comma")
-                    .split(",");
-            String wordToFind = words[0].trim();
-            String replaceWith = words[1].trim();
-
-            // replacing the words
-            textArea.setText(textArea.getText().replaceAll(wordToFind, replaceWith));
+            new FindAndReplace();
         });
 
         lineWrapOn.addActionListener((ae) -> {
@@ -289,7 +284,7 @@ public class Teditor {
         });
 
         aboutItem.addActionListener((ae) -> {
-            JOptionPane.showMessageDialog(frame, "Teditor\nCopyright 2021\nVersion 0.0.4");
+            JOptionPane.showMessageDialog(mainFrame, "Teditor\nCopyright 2021\nVersion 0.0.4");
         });
     }
 
@@ -298,6 +293,47 @@ public class Teditor {
         Teditor teditor = new Teditor();
         teditor.design();
         teditor.buttonFunctions();
+    }
+
+    class FindAndReplace {
+
+        JFrame replaceFrame = new JFrame("Find and Replace");
+        JLabel findWhatLabel = new JLabel("Find What");
+        JLabel replaceWithLabel = new JLabel("Replace With");
+        JTextField findWhatField = new JTextField();
+        JTextField replaceWithField = new JTextField();
+        JButton replaceBtn = new JButton("Replace");
+
+        public FindAndReplace() {
+            replaceFrame.setSize(300, 200);
+            replaceFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            replaceFrame.setLayout(null);
+            replaceFrame.setLocationRelativeTo(mainFrame);
+            replaceFrame.setResizable(false);
+
+            // setting dimensions
+            findWhatLabel.setBounds(10, 10, 90, 30);
+            findWhatField.setBounds(110, 10, 150, 30);
+            replaceWithLabel.setBounds(10, 50, 90, 30);
+            replaceWithField.setBounds(110, 50, 150, 30);
+            replaceBtn.setBounds(110, 100, 90, 30);
+
+            // adding components
+            replaceFrame.getContentPane().add(replaceWithField);
+            replaceFrame.getContentPane().add(findWhatField);
+            replaceFrame.getContentPane().add(replaceWithLabel);
+            replaceFrame.getContentPane().add(findWhatLabel);
+            replaceFrame.getContentPane().add(replaceBtn);
+            replaceFrame.setVisible(true);
+
+            replaceBtn.addActionListener((ae) -> {
+                String target = findWhatField.getText().trim();
+                String replacement = replaceWithField.getText().trim();
+                String content = textArea.getText().replace(target, replacement);
+                textArea.setText(content);
+                replaceFrame.dispose();
+            });
+        }
     }
 
     static void nimbusLAF() {
